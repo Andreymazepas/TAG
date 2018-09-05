@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lib/readgml/readgml.h"
+#include "readgml/readgml.h"
+#include "graphlib/graph.h"
 
 
 int main() {

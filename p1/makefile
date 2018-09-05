@@ -1,7 +1,7 @@
 CC=gcc
 ODIR = obj
 SDIR = src
-INC = -Isrc -I"lib/gmldata" -I"lib/graphlib"
+INC = -Isrc -Ilib
 CFLAGS= -Wall -std=c99
 main: readgml.o graphlib.o
 	$(CC) $(INC) src/main.c obj/readgml.o -o p1 $(CLAGS)
