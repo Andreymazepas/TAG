@@ -18,6 +18,14 @@ int main() {
     printf("- Possui %d vértices -\n", mynetwork->nvertices);
     for(int i=1; i< mynetwork->nvertices+1; i++){
         printf("vertex %d: %d\n", i, mynetwork->vertex[i-1].degree);
+        EDGE *edge = mynetwork->vertex[i-1].edge;
+        printf("\t");
+        for(int j =0; j < mynetwork->vertex[i-1].degree; j++){
+            printf("%d, ", (edge->target)+1);
+            edge++;
+        }
+        printf("\n");
+        
     }
     return 0;
 }
