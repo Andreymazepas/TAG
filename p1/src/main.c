@@ -1,12 +1,24 @@
+/*
+Projeto 1 de Teoria e Aplicacao de Grafos 2018/2
+Andrey Emmanuel Matrosov Mazépas - 16/0112362 
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "readgml/readgml.h"
-#include "graphlib/graph.h"
+#include "graphlib/graph.h" // biblioteca auxiliar de grafo
 #define DG_DYNARR_IMPLEMENTATION
-#include "DG_dynarr.h"
+#include "DG_dynarr.h" // biblioteca auxiliar de arrays dinamicos
 
-NETWORK *mynetwork;
-FILE *myfile;
+
+
+
+
+// ********************** declaracoes iniciais ***********************
+
+NETWORK *mynetwork; // estrutura onde será guardado o grafo
+FILE *myfile; // arquivo GML
 DA_TYPEDEF(int, intArray);
 void BronKerbosch(intArray, intArray, intArray);
 int findIDX(intArray arr, int n);
@@ -14,6 +26,59 @@ intArray intersectionIntArr(intArray arr1, intArray arr2);
 void printIntArr(intArray* arr, const char* name);
 intArray Vizinhos(int v);
 
+// *********************************************************************
+
+
+
+int main() {
+    // faz a leitura do arquivo GML para a estrutura NETWORK
+    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));    
+    myfile = fopen("data/gmldata/karate.gml", "r");
+    if (myfile == NULL){
+        printf("Error opening file\n");
+        return -1;
+    }
+    read_network(mynetwork, myfile);
+    fclose(myfile);
+
+
+    // (1) o vértice, e seu respectivo grau (para todos os vértices);
+    printf("*** Grafo possui %d vértices ***\n", mynetwork->nvertices);
+    printf("(1) o vértice, e seu respectivo grau (para todos os vértices)\n");
+    // inicia um array com todos os vertices e printa seu grau
+    intArray P;
+    da_init(P);
+    for(int i=1; i< mynetwork->nvertices+1; i++){
+        printf("vertex %d: grau %d\n", i, mynetwork->vertex[i-1].degree);
+        da_add(P, mynetwork->vertex[i-1].id - 1);
+    }
+
+
+    // (2) todos os cliques maximais (indicando o número de vértices e quais);
+    printf("\n\n(2) todos os cliques maximais (indicando o número de vértices e quais)\n");
+    // inicia dois arrays vazios para o algoritmo
+    intArray R, X;
+    da_init(R);
+    da_init(X);
+    BronKerbosch(R, P, X); // algoritmo de BronKerbosch
+    
+    
+    // (3) O Coeficiente de Aglomeração de cada vértice;
+    printf("\n\n(3) O Coeficiente de Aglomeração de cada vértice\n");
+
+
+
+    // (4) O Coeficiente médio de Aglomeração do Grafo.
+    printf("\n\n(4) O Coeficiente médio de Aglomeração do Grafo.\n");
+
+    return 0;
+}
+
+
+
+//****************************BronKerbosch***************************
+
+// pseudocodigo:
 //    BronKerbosch1(R, P, X):
 //        if P and X are both empty:
 //            report R as a maximal clique
@@ -23,41 +88,38 @@ intArray Vizinhos(int v);
 //            X := X ⋃ {v}
 
 void BronKerbosch(intArray R, intArray P, intArray X){
-    // printf("Bronkerbusch:\n");
-    // printIntArr(&R, "R");
-    // printIntArr(&P, "P");
-    // printIntArr(&X, "X");
-    
+//        if P and X are both empty:
     if(da_count(P) + da_count(X) == 0){
-        printIntArr(&R, "vertices");
+        printf("%ld ", da_count(R));
+        printIntArr(&R, "vertices"); //    report R as a maximal clique
     }
-    intArray P1;
-    da_init(P1);
     
+    intArray P1; // faz uma copia de P
+    da_init(P1);
     for(int i = 0; i < da_count(P); i++)
         da_add(P1, da_get(P,i));
     
+    //        for each vertex v in P:    
     for(int i =0 ; i < da_count(P); i++)
     {
         int v = da_get(P, i);
-        da_add(R, v);
-        // intArray memama;
-        // da_init(memama);
-        // memama = Vizinhos(v);
-        // intArray mechupa;
-        // da_init(mechupa);
-        // mechupa = intersectionIntArr(P1, Vizinhos(v));
-        // printIntArr(&memama, "vizinhos");
-        // printIntArr(&mechupa, "intersection");
-        BronKerbosch(R, intersectionIntArr(P1, Vizinhos(v)),intersectionIntArr(X, Vizinhos(v)));
-        da_delete(R, findIDX(R, v));
-        da_delete(P1, findIDX(P1, v));
-        da_add(X, v);
+        da_add(R, v); // R ⋃ {v}
+        BronKerbosch(R, intersectionIntArr(P1, Vizinhos(v)),intersectionIntArr(X, Vizinhos(v))); //   BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
+        da_delete(R, findIDX(R, v)); // reseta o R
+        da_delete(P1, findIDX(P1, v)); //   P := P \ {v}
+        da_add(X, v);  //            X := X ⋃ {v}
     }
-    
-
 }
+//*************************************************************************
 
+
+
+
+
+
+//******************** funcoes auxiliares **********************************
+
+// retorna a interseccao de dois arrays
 intArray intersectionIntArr(intArray arr1, intArray arr2){
     intArray intersection;
     da_init(intersection);
@@ -73,9 +135,10 @@ intArray intersectionIntArr(intArray arr1, intArray arr2){
     return intersection;    
 }
 
+
+// printa um array
 void printIntArr(intArray* arr, const char* name)
 {
-    // note that arr is a pointer here, so use *arr in the da_*() functions.
     printf("%s = {", name);
     if(da_count(*arr) > 0)
         printf(" %d", arr->p[0]+1);
@@ -85,45 +148,8 @@ void printIntArr(intArray* arr, const char* name)
 }
 
 
-int main() {
 
-    // faz a leitura do arquivo GML para a estrutura NETWORK
-    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));    
-    myfile = fopen("data/gmldata/karate.gml", "r");
-    if (myfile == NULL){
-        printf("Error opening file");
-        return -1;
-    }
-    read_network(mynetwork, myfile);
-    fclose(myfile);
-
-    // inicia um array com todos os vertices
-
-    
-
-    // (1) o vértice, e seu respectivo grau (para todos os vértices);
-    printf("- Possui %d vértices -\n", mynetwork->nvertices);
-
-    intArray P;
-    da_init(P);
-    for(int i=1; i< mynetwork->nvertices+1; i++){
-        //printf("vertex %d: %d\n", i, mynetwork->vertex[i-1].degree);
-        da_add(P, mynetwork->vertex[i-1].id - 1);
-    }
-    intArray teste = Vizinhos(33);
-    printIntArr(&teste, "teste");
-
-    intArray R, X;
-    da_init(R);
-    da_init(X);
-    BronKerbosch(R, P, X);
-    
-    // (2) todos os cliques maximais (indicando o número de vértices e quais);
-    // (3) O Coeficiente de Aglomeração de cada vértice;
-    // (4) O Coeficiente médio de Aglomeração do Grafo.
-    return 0;
-}
-
+// retorna um array com todos os vizinhos de um vertice V
 intArray Vizinhos(int v){
     intArray vizinhos;
     da_init(vizinhos);
@@ -136,6 +162,8 @@ intArray Vizinhos(int v){
     return vizinhos;
 }
 
+
+// retorna o indice de um item n em um array
 int findIDX(intArray arr, int n){
     for(int i =0; i<da_count(arr); i++) {
         if (n == da_get(arr, i))
@@ -143,3 +171,4 @@ int findIDX(intArray arr, int n){
     }
     return -1;
 }
+//***************************************************************************
