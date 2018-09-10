@@ -25,6 +25,9 @@ int findIDX(intArray arr, int n);
 intArray intersectionIntArr(intArray arr1, intArray arr2);
 void printIntArr(intArray* arr, const char* name);
 intArray Vizinhos(int v);
+double aglomeracao(VERTEX v);
+int isVizinho(int, int);
+double mediaAglomeracao();
 
 // *********************************************************************
 
@@ -65,11 +68,14 @@ int main() {
     
     // (3) O Coeficiente de Aglomeração de cada vértice;
     printf("\n\n(3) O Coeficiente de Aglomeração de cada vértice\n");
-
+    for(int i=0; i < mynetwork->nvertices; i++){
+        printf("vertice %d: %f\n", i+1, aglomeracao(mynetwork->vertex[i]));
+    }
 
 
     // (4) O Coeficiente médio de Aglomeração do Grafo.
     printf("\n\n(4) O Coeficiente médio de Aglomeração do Grafo.\n");
+    printf("Coeficiente médio de aglomeração: %f\n", mediaAglomeracao());
 
     return 0;
 }
@@ -113,7 +119,42 @@ void BronKerbosch(intArray R, intArray P, intArray X){
 //*************************************************************************
 
 
+double aglomeracao(VERTEX v){
+    int grau = v.degree;
+    intArray vizinhos;
+    da_init(vizinhos); 
+    vizinhos = Vizinhos(v.id -1);
+    int links = 0;
+    
+    // encontrar o numero de links entre os vizinhos
+    for(int i = 0; i < da_count(vizinhos); i++)
+    {
+        for(int j = i+1; j < da_count(vizinhos); j++)
+        {
+            if(i != j && isVizinho(da_get(vizinhos,i)-1, da_get(vizinhos,j)-1))
+                links++;       
+        }
+    }
+    //printf("id = %d ,links = %d, grau = %d\n", v.id,links, grau);
+    //printIntArr(&vizinhos, "vizinhos");
+    double coefaglomeracao = (2.0*links) / (grau*(1.0*(grau-1)));
+    if(links == 0)
+        coefaglomeracao = 0;
+    return coefaglomeracao;
+}
 
+double mediaAglomeracao(){
+    int nVertices = mynetwork->nvertices;
+    double mediaAglomeracao_ = 0;
+
+    for(int i = 0; i < nVertices; i++)
+    {
+        mediaAglomeracao_ += aglomeracao(mynetwork->vertex[i]);
+    }
+    mediaAglomeracao_ = (1.0 / nVertices) * mediaAglomeracao_;
+    return mediaAglomeracao_;
+    
+}
 
 
 
@@ -160,6 +201,18 @@ intArray Vizinhos(int v){
         edge++;
     }
     return vizinhos;
+}
+
+// checa se v1 e v2 são vizinhos
+int isVizinho(int v1, int v2){
+    intArray v1Vizinhos = Vizinhos(v1);
+    
+    for(int i = 0; i < da_count(v1Vizinhos); i++)
+    {
+        if(da_get(v1Vizinhos, i) == v2)
+            return 1;
+    }
+    return 0;
 }
 
 
