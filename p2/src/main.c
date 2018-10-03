@@ -8,16 +8,23 @@ Andrey Emmanuel Matrosov Mazépas - 16/0112362
 #include <stdlib.h>
 #include "readgml/readgml.h"
 #include "graphlib/graph.h" // biblioteca auxiliar de grafo
+// implementacao simples de uma pilha
+#define push(sp, n) (*((sp)++) = (n))
+#define pop(sp) (*--(sp))
 
 NETWORK *mynetwork; // estrutura onde será guardado o grafo
 FILE *myfile; // arquivo GML
-
+int stack[100]; // espaco em memoria para a pilha global
+int *sp; // ponteiro da pilha
+int NVERTICES;
 
 void printNetwork(){
       for(int i=1; i< mynetwork->nvertices+1; i++){
-        printf("vertex %d: label %s weight %d\n", i, mynetwork->vertex[i-1].label, mynetwork->vertex[i-1].weight);
+        printf("Disciplina %s:\n", mynetwork->vertex[i-1].label);
         if(mynetwork->vertex[i-1].degree == 0)
             printf("\n");
+        else
+            printf("\t");
         for(int j = 0; j < mynetwork->vertex[i-1].degree; j++)
         {
             int target = mynetwork->vertex[i-1].edge[j].target;
@@ -30,7 +37,48 @@ void printNetwork(){
         
     }
 }
+
+
+void topologicalRecursive(int v_id, int visited[]){
+    visited[v_id] = 1; // marca o atual como visitado
+    VERTEX v = mynetwork->vertex[v_id];
+
+    for(int i = 0; i < v.degree; i++){
+        VERTEX adj  = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
+        if (!visited[adj.id]){
+            topologicalRecursive(adj.id, visited);
+        }
+    }
+
+    push(sp, v_id);
+}
+
+void printTopologicalOrder(){
+
+    sp = stack; // inicializa a pilha
+    int visited[NVERTICES];
+    
+    for(int i = 0; i < NVERTICES; i++)
+        visited[i] = 0;
+    
+
+    for(int i=0; i< NVERTICES; i++){
+        VERTEX v = mynetwork->vertex[i];
+        if(visited[v.id] == 0){
+            topologicalRecursive(v.id, visited);
+        }
+    }
+
+    while(sp != stack){
+        printf("%s\n", mynetwork->vertex[pop(sp)].label);
+    }
+    
+}
+
+
 int main() {
+
+
     // faz a leitura do arquivo GML para a estrutura NETWORK
     mynetwork = (NETWORK *)malloc(sizeof(NETWORK));    
     myfile = fopen("data/Untitled.gml", "r");
@@ -40,6 +88,8 @@ int main() {
     }
     read_network(mynetwork, myfile);
     fclose(myfile);
+
+    NVERTICES = mynetwork->nvertices;
 
     int choice=0;
     while(choice!='4')
@@ -62,6 +112,7 @@ int main() {
         break;
         case '2':
         printf("\n\n");
+        printTopologicalOrder();
         break;
         case '3':
         printf("\n\n");
