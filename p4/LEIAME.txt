@@ -2,19 +2,18 @@ Trabalho 4 da disciplina Teoria e Aplicação de Grafos 2018/2
 Andrey Emmanuel Matrosov Mazépas 16/0112362
 Pedro Eugênio Guimarães Carvalho 14/0158197
 
-Basta dar o comando "make" e executar o programa "./p4"
-O algoritmo foi implementado conforme descrito no artigo, infelizmente mesmo com todas as otimizações o tempo para calcular
-todas as 25 mil arestas do arquivo de emails em milhões de iterações se mostrou muito grande, com mais de 30 segundos por iteração e horas para encontrar as 42 comunidades.
+	Basta dar o comando "make" e executar o programa "./p4"
 
-Contanto o algoritmo se mostrou eficiente quando o numero de vertices é menor que 50, no codigo atual ele está calculando as comunidades
-do grafo "Karate Club" do primeiro trabalho, pois esse exemplo se encontra no artigo e foi possivel verificar que o dendograma bate perfeitamente com os resultados obtidos.
-A maior dificuldade do trabalho foi entender os criterios de parada, pois nao ficou claro o motivo de juntar comunidades quando o decrescimo na modularidade for menor possivel.
-
-A cada passo o programa exibe o valor da modularidade total (Q), que aumenta conforme as comunidades vao se juntando. Ao final sao exibidos o total de comunidades e seus componentes.
-
-Os calculos do karate club foram acompanhados pelo dendograma do artigo e por calculos a mão para garantir que estavam correto, alem dele foram feitos outros exemplos de grafos com comunidades.
-
-O resultado do programa foram 3 comunidades, ao inves de duas esperadas, pois a ultima união necessaria entra no quadro de "menor decrescimo possivel", com modularidade total de 2 comunidades
-menor que a modularidade total das 3 encontradas e nao foi implementado, ainda assim está como mostra o dendograma, as comunidades 0 e 1 se juntam no algoritmo do artigo no passo final,
-e a comunidade 2 está correta.
-
+	O algoritmo foi implementado conforme descrito no artigo, infelizmente mesmo com todas as otimizações o tempo para calculartodas as 25 mil arestas do arquivo de emails em milhões de iterações se mostrou muito grande, com mais de 30 segundos por iteração e horas para encontrar as 42 comunidades.
+	
+    Contanto o algoritmo se mostrou eficiente quando o numero de vertices é menor que 50, no codigo atual ele está calculando as comunidadesdo grafo "Karate Club" do primeiro trabalho, pois esse exemplo se encontra no artigo e foi possivel verificar que o dendograma bate perfeitamente com os resultados obtidos.
+	
+    A maior dificuldade do trabalho foi entender os criterios de parada, pois nao ficou claro o motivo de juntar comunidades quando o decrescimo na modularidade for menor possivel.
+	
+    A cada passo o programa exibe o valor da modularidade total (Q), que aumenta conforme as comunidades vao se juntando e quais comunidades foram escolhidas para resultar no maior aumento.
+	
+    Ao final sao exibidos o total de comunidades e seus componentes.
+	
+    Os calculos do karate club foram acompanhados pelo dendograma do artigo e por calculos a mão para garantir que estavam correto, alem dele foram feitos outros exemplos de grafos com comunidades.
+	
+    O resultado do programa foram 3 comunidades, ao inves de duas esperadas, pois a ultima união necessaria entra no quadro de "menor decrescimo possivel", com modularidade total de 2 comunidadesmenor que a modularidade total das 3 encontradas e nao foi implementado pois tambem resultaria na uniao de todas as comunidades no final em uma só,ainda assim está como mostra o dendograma, as comunidades 0 e 1 se juntam no algoritmo do artigo no passo final,e a comunidade 2 está correta.

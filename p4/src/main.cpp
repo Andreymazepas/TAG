@@ -104,6 +104,7 @@ int main(void)
     // Inicio do algoritmo
     num_edges = Grafo.num_edges();
     bool atualizouComunidade = true;
+    double melhorModularidade;
 
     // O loop se mantem enquanto tiverem mudanças no conjunto de comunidades
     // uma mudança se dá quando há pelo menos um par que aumenta o Q total do grafo
@@ -115,7 +116,7 @@ int main(void)
 
         // calculando somatorio de modularidades antes de aplicar o algoritmo
         double somatorioModularidadeAtual = getSomatorioModularidade(Grafo, comunidades);
-        double melhorModularidade = somatorioModularidadeAtual; // variavel para guardar o melhor valor de modularidade encontrado
+        melhorModularidade = somatorioModularidadeAtual; // variavel para guardar o melhor valor de modularidade encontrado
         std::cout << melhorModularidade << std::endl;           // imprime a modularidade encontrada, que sera a total
         int par1 = -1;                                          // primeiro elemento do par que produz a melhor modularidade
         int par2 = -1;                                          // segundo elemento
@@ -169,15 +170,24 @@ int main(void)
         }
         // se houve mudança nas comunidades, aplicar no vetor comunidades
         // insere a nova uniao e remove a unidade antiga
+        // imprime quais foram as comunidades unidas
         if (atualizouComunidade)
         {
+            std::cout << std::endl << "{ ";
+            for (std::vector<uint>::const_iterator j = comunidades.at(par1).begin(); j != comunidades.at(par1).end(); ++j)
+                std::cout << *j << ' ';
+            std::cout << "} + { ";
+            for (std::vector<uint>::const_iterator j = comunidades.at(par2).begin(); j != comunidades.at(par2).end(); ++j)
+                std::cout << *j << ' ';
+            std::cout << "}" << std::endl;
             comunidades.at(par1).insert(comunidades.at(par1).end(), comunidades.at(par2).begin(), comunidades.at(par2).end());
             comunidades.erase(comunidades.begin() + par2);
         }
     }
 
     // ao final do loop imprimir o total de comunidades
-    std::cout << "TOTAL COMUNIDADES: " << comunidades.size() << std::endl;
+    std::cout << "\nTOTAL COMUNIDADES: " << comunidades.size() << std::endl;
+    std::cout << "SOMATORIO DE MODULARIDADES DO GRAFO (Q): " << melhorModularidade << std::endl;
     // e quais sao seus elementos
     for (int i = 0; i < comunidades.size(); i++)
     {
