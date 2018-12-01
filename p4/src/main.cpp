@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ngraph.hpp>
-#define DG_DYNARR_IMPLEMENTATION
-#include "DG_dynarr.h" // biblioteca auxiliar de arrays dinamicos
-DA_TYPEDEF(int, intArray);
+#include <ngraph.hpp> // bilbioteca auxiliar com ferramentas para grafos
 #define NUMERO_VERTICES 1005
 #define NUMERO_ARESTAS 25571
 using namespace NGraph;
-int num_edges = 0;
 
+int num_edges = 0; // variavel global para armazenar previamente o numero de arestas
+
+// Função que retorna a modularidade de um conjunto de vertices em relação ao Grafo total
 double getModularidade(Graph Grafo, Graph::vertex_set S)
 {
     double arestasAtotal = 0.0;
     double arestasEtotal = 0.0;
 
+    // percorre todo o conjunto de vertices e faz o calculo com arestas que estariam entrando num grafo completo
+    // e com as arestas que realmente estao entrando na comunidade
     for (Graph::vertex_set::const_iterator t = S.begin(); t != S.end(); t++)
     {
         double arestasEntrando = 0.0;
@@ -41,6 +42,8 @@ double getModularidade(Graph Grafo, Graph::vertex_set S)
     return (-arestasAtotal + arestasEtotal);
 }
 
+// Função que retorna o somatorio de todas as modularidades (tratado no artigo como Q)
+// de um conjunto de comunidades.
 double getSomatorioModularidade(Graph Grafo, std::vector<std::vector<uint>> comunidades)
 {
 
@@ -64,6 +67,7 @@ int main(void)
 
     Graph Grafo;
 
+    // Abre e le o arquivo carregando vertices e arestas nas estruturas de Grafo e comunidades
     FILE *fp;
     fp = fopen("data/karate.txt", "r");
     if (fp == NULL)
@@ -85,6 +89,7 @@ int main(void)
 
     std::cout << std::endl;
     std::sort(vertices.begin(), vertices.end());
+    // apaga vertices e arestas repetidos por nao se tratar de um digrafo
     vertices.erase(std::unique(vertices.begin(), vertices.end()), vertices.end());
 
     std::vector<std::vector<uint>> comunidades;
@@ -95,26 +100,28 @@ int main(void)
         aux.push_back(*i);
         comunidades.push_back(aux);
     }
-    num_edges = Grafo.num_edges();
-    int nArestas = comunidades.size();
-    int totalComunidades = 0;
-    int iterador = 0;
 
+    // Inicio do algoritmo
+    num_edges = Grafo.num_edges();
     bool atualizouComunidade = true;
+
+    // O loop se mantem enquanto tiverem mudanças no conjunto de comunidades
+    // uma mudança se dá quando há pelo menos um par que aumenta o Q total do grafo
     while (atualizouComunidade)
     {
         atualizouComunidade = false;
-        Graph::vertex_set possivelComunidade;
-        Graph::vertex_set comunidadeAtual;
-        std::cout << "calculando somatorio de modularidades..." << std::endl;
-        double somatorioModularidadeAtual = getSomatorioModularidade(Grafo, comunidades);
-        double melhorModularidade = somatorioModularidadeAtual;
-        int indiceMelhorModularidade = -1;
-        std::cout << melhorModularidade << std::endl;
-        int par1 = -1;
-        int par2 = -1;
+        Graph::vertex_set possivelComunidade; // par a ser analisado
+        Graph::vertex_set comunidadeAtual;    // a comunidade sendo comparada
 
-        // a ideia é percorrer todos as outras comunidades e combinar com a atual pra ver quem tem a melhor modularidade
+        // calculando somatorio de modularidades antes de aplicar o algoritmo
+        double somatorioModularidadeAtual = getSomatorioModularidade(Grafo, comunidades);
+        double melhorModularidade = somatorioModularidadeAtual; // variavel para guardar o melhor valor de modularidade encontrado
+        std::cout << melhorModularidade << std::endl;           // imprime a modularidade encontrada, que sera a total
+        int par1 = -1;                                          // primeiro elemento do par que produz a melhor modularidade
+        int par2 = -1;                                          // segundo elemento
+
+        // para melhorar a performance e evitar repetir chamadas de funcoes iguais
+        // a modularidade individual das comunidades nesse passo serão pre calculadas
         std::vector<double> modularidadesPrecalculadas;
         for (int i = 0; i < comunidades.size(); i++)
         {
@@ -126,15 +133,15 @@ int main(void)
             modularidadesPrecalculadas.push_back(getModularidade(Grafo, aux));
         }
 
+        // a ideia é percorrer todos as comunidades e combinar com a atual pra ver quem tem a melhor modularidade
+        // se trata de uma combinacao n dois a dois
         for (int z = 0; z < comunidades.size(); z++)
         {
-            std::cout << z << " de " << comunidades.size() << std::endl;
-
             comunidadeAtual.clear();
             for (std::vector<uint>::const_iterator j = comunidades.at(z).begin(); j != comunidades.at(z).end(); ++j)
                 comunidadeAtual.insert(*j);
-            double modularidadeAtual = modularidadesPrecalculadas.at(z);
-
+            double modularidadeAtual = modularidadesPrecalculadas.at(z); // modularidade da comunidade atual
+            // combina com todas as outras
             for (int i = z + 1; i < comunidades.size(); i++)
             {
                 possivelComunidade.clear();
@@ -142,11 +149,15 @@ int main(void)
                 {
                     possivelComunidade.insert(*j);
                 }
+                // por ser um somatorio, remover duas comunidades e adicionar sua uniao tem o mesmo efeito que recalcular o somatorio com a uniao
+                // mais uma tentativa de salvar performance
                 double modularidadeTotal = somatorioModularidadeAtual - (modularidadesPrecalculadas.at(i) + modularidadeAtual);
                 for (Graph::vertex_set::const_iterator t = comunidadeAtual.begin(); t != comunidadeAtual.end(); t++)
                     possivelComunidade.insert(*t);
                 double possivelModularidade = modularidadeTotal + getModularidade(Grafo, possivelComunidade);
 
+                // se o novo par de comunidades encontrado gerar uma modularidade maior que a atual
+                // o par sera salvo para atualizar o grafo
                 if ((possivelModularidade >= melhorModularidade))
                 {
                     melhorModularidade = possivelModularidade;
@@ -156,17 +167,18 @@ int main(void)
                 }
             }
         }
-
+        // se houve mudança nas comunidades, aplicar no vetor comunidades
+        // insere a nova uniao e remove a unidade antiga
         if (atualizouComunidade)
         {
             comunidades.at(par1).insert(comunidades.at(par1).end(), comunidades.at(par2).begin(), comunidades.at(par2).end());
             comunidades.erase(comunidades.begin() + par2);
-            iterador++;
-            totalComunidades++;
         }
     }
-    std::cout << "TOTAL COMUNIDADES: " << comunidades.size() << std::endl;
 
+    // ao final do loop imprimir o total de comunidades
+    std::cout << "TOTAL COMUNIDADES: " << comunidades.size() << std::endl;
+    // e quais sao seus elementos
     for (int i = 0; i < comunidades.size(); i++)
     {
         std::cout << i << ": ";
