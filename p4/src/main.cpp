@@ -7,6 +7,7 @@ DA_TYPEDEF(int, intArray);
 #define NUMERO_VERTICES 1005
 #define NUMERO_ARESTAS 25571
 using namespace NGraph;
+int num_edges = 0;
 
 double getModularidade(Graph Grafo, Graph::vertex_set S)
 {
@@ -18,7 +19,7 @@ double getModularidade(Graph Grafo, Graph::vertex_set S)
         double arestasEntrando = 0.0;
         double arestasEsperadasEntrando = 0.0;
         arestasEsperadasEntrando = Grafo.out_degree(*t);
-        arestasAtotal += Grafo.out_degree(*t);
+        arestasAtotal += arestasEsperadasEntrando;
 
         Graph::vertex_set S2 = Grafo.out_neighbors(*t);
         for (Graph::vertex_set::const_iterator vertex = Grafo.in_neighbors(*t).begin(); vertex != Grafo.in_neighbors(*t).end(); vertex++)
@@ -34,9 +35,9 @@ double getModularidade(Graph Grafo, Graph::vertex_set S)
         arestasEtotal += arestasEntrando;
     }
 
-    arestasAtotal /= Grafo.num_edges();
+    arestasAtotal /= num_edges;
     arestasAtotal = arestasAtotal * arestasAtotal;
-    arestasEtotal /= Grafo.num_edges();
+    arestasEtotal /= num_edges;
     return (-arestasAtotal + arestasEtotal);
 }
 
@@ -64,7 +65,7 @@ int main(void)
     Graph Grafo;
 
     FILE *fp;
-    fp = fopen("data/teste.txt", "r");
+    fp = fopen("data/karate.txt", "r");
     if (fp == NULL)
     {
         printf("Erro ao abrir o arquivo\n");
@@ -75,7 +76,7 @@ int main(void)
     for (int i = 0; i < NUMERO_ARESTAS; i++)
     {
         int aresta1, aresta2;
-        fscanf(fp, "%d %d\n", &aresta1, &aresta2);
+        fscanf(fp, "[%d %d]\n", &aresta1, &aresta2);
         Grafo.insert_edge(aresta1, aresta2);
         Grafo.insert_edge(aresta2, aresta1);
         vertices.push_back(aresta1);
@@ -94,8 +95,7 @@ int main(void)
         aux.push_back(*i);
         comunidades.push_back(aux);
     }
-    std::cout << std::endl;
-
+    num_edges = Grafo.num_edges();
     int nArestas = comunidades.size();
     int totalComunidades = 0;
     int iterador = 0;
