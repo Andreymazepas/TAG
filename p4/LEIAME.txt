@@ -4,16 +4,15 @@ Pedro Eugênio Guimarães Carvalho 14/0158197
 
 	Basta dar o comando "make" e executar o programa "./p4"
 
-	O algoritmo foi implementado conforme descrito no artigo, infelizmente mesmo com todas as otimizações o tempo para calculartodas as 25 mil arestas do arquivo de emails em milhões de iterações se mostrou muito grande, com mais de 30 segundos por iteração e horas para encontrar as 42 comunidades.
+	O algoritmo foi implementado conforme descrito no artigo. Infelizmente, mesmo com todas as otimizações, o tempo para calcular todas as 25 mil arestas do arquivo de emails em milhões de interações se mostrou muito grande, com mais de 30 segundos por interação e horas para encontrar as 42 comunidades.
+    
+    Entretanto, o algoritmo se mostrou eficiente quando o número de vértices é menor que 50. No código atual, ele está calculando as comunidades do grafo "Karate Club" do primeiro trabalho, pois este exemplo se encontra no artigo. Também foi possível verificar que o dendograma bate perfeitamente com os resultados obtidos.
+    
+    A maior dificuldade do trabalho foi entender os critérios de parada, pois não ficou claro o motivo de juntar comunidades quando o decréscimo na modularidade era o menor possível.
+    
+    A cada passo ele mostra o valor do somatorio atual das modularidades, o qual aumenta conforme as comunidades se juntam; e, além disso, também mostra quais comunidades se juntaram.
+    Ao final, são exibidos o total de comunidades encontradas e seus componentes.
+    
+    Os cálculos do karate club realizados pelo algoritmo foram acompanhados pelo dendograma do artigo e por cálculos a mão para garantir que estavam corretos. Além dele, foram feitos outros exemplos de grafos com comunidades.
 	
-    Contanto o algoritmo se mostrou eficiente quando o numero de vertices é menor que 50, no codigo atual ele está calculando as comunidadesdo grafo "Karate Club" do primeiro trabalho, pois esse exemplo se encontra no artigo e foi possivel verificar que o dendograma bate perfeitamente com os resultados obtidos.
-	
-    A maior dificuldade do trabalho foi entender os criterios de parada, pois nao ficou claro o motivo de juntar comunidades quando o decrescimo na modularidade for menor possivel.
-	
-    A cada passo o programa exibe o valor da modularidade total (Q), que aumenta conforme as comunidades vao se juntando e quais comunidades foram escolhidas para resultar no maior aumento.
-	
-    Ao final sao exibidos o total de comunidades e seus componentes.
-	
-    Os calculos do karate club foram acompanhados pelo dendograma do artigo e por calculos a mão para garantir que estavam correto, alem dele foram feitos outros exemplos de grafos com comunidades.
-	
-    O resultado do programa foram 3 comunidades, ao inves de duas esperadas, pois a ultima união necessaria entra no quadro de "menor decrescimo possivel", com modularidade total de 2 comunidadesmenor que a modularidade total das 3 encontradas e nao foi implementado pois tambem resultaria na uniao de todas as comunidades no final em uma só,ainda assim está como mostra o dendograma, as comunidades 0 e 1 se juntam no algoritmo do artigo no passo final,e a comunidade 2 está correta.
+    O resultado do programa mostrou que no fim foram encontradas 3 comunidades em vez das 2 descritas no artigo. Se houver a fusão das duas primeiras comunidades do programa,o resultado seria igual ao do artigo, porém o valor da modularidade total diminuiria, entrando no quadro de "menor decrescimo possivel", que nao foi implementado pois não é claro o critério de parada quando esse quadro é levado em conta.
