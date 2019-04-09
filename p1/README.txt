@@ -1,4 +1,5 @@
-Trabalho 1 da disciplina Teoria e Aplicação de Grafos 2018/2
-Andrey Emmanuel Matrosov Mazépas
+Trabalho 1 da disciplina Teoria e Aplicaï¿½ï¿½o de Grafos 2018/2
+Andrey Emmanuel Matrosov Mazï¿½pas
+Kevin da Silva Souto
 
 Basta dar o comando "make" e executar o programa "./p1"

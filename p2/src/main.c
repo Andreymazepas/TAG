@@ -1,6 +1,7 @@
 /*
 Projeto 2 de Teoria e Aplicacao de Grafos 2018/2
-Andrey Emmanuel Matrosov Mazépas - 16/0112362 
+Andrey Emmanuel Matrosov Mazépas - 16/0112362
+Kevin da Silva Souto - 16/0046688
 
 */
 
@@ -50,7 +51,7 @@ void printNetwork(){
             else {
                 printf("; ");}
         }
-        
+
     }
 }
 
@@ -62,7 +63,7 @@ intArray encontraOrigens(){
     for(int i=0; i<NVERTICES; i++){
         arestasEntrada[i] =0;
     }
-    
+
     for(int i = 0; i < NVERTICES; i++)
     {
         VERTEX v = mynetwork->vertex[i];
@@ -72,16 +73,16 @@ intArray encontraOrigens(){
             arestasEntrada[e.target] = arestasEntrada[e.target] + 1;
         }
     }
-    
+
     intArray idsOrigem;
     da_init(idsOrigem);
-    
+
     for(int i = 0; i < NVERTICES; i++)
     {
         if(arestasEntrada[i]==0)
             da_add(idsOrigem, i);
     }
-    
+
     return idsOrigem;
 }
 
@@ -116,10 +117,10 @@ void printCP(){
     for(int i =0; i < da_count(origens); i++){
         sp = stack;
         int visited[NVERTICES];
-    
+
         for(int i = 0; i < NVERTICES; i++)
             visited[i] = 0;
-        
+
         intArray folhas;
         da_init(folhas);
         DFS(i, visited, 0); // encontra as folhas
@@ -127,7 +128,7 @@ void printCP(){
         while(sp != stack){
             da_add(folhas, pop(sp));
         }
-        
+
         int maxPeso = 0;
         int idmaxPeso = 0;
         // ve qual o caminho de maior peso de origem ate a folha
@@ -143,7 +144,7 @@ void printCP(){
         path1.destino = idmaxPeso;
         path1.peso = maxPeso;
         da_add(maxPaths, path1);
-        
+
     }
    // ve todos os nos analisados e o peso encontrado
     int maxPeso = 0;
@@ -181,10 +182,10 @@ void printTopologicalOrder(){
 
     sp = stack; // inicializa a pilha
     int visited[NVERTICES];
-    
+
     for(int i = 0; i < NVERTICES; i++)
         visited[i] = 0;
-    
+
     // itera sobre todos os nos para realizar a ordenacao topologica
     for(int i=0; i< NVERTICES; i++){
         VERTEX v = mynetwork->vertex[i];
@@ -196,7 +197,7 @@ void printTopologicalOrder(){
     while(sp != stack){
         printf("%s\n", mynetwork->vertex[pop(sp)].label);
     }
-    
+
 }
 
 
@@ -204,7 +205,7 @@ int main() {
 
 
     // faz a leitura do arquivo GML para a estrutura NETWORK
-    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));    
+    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));
     myfile = fopen("data/Untitled.gml", "r");
     if (myfile == NULL){
         printf("Error opening file\n");

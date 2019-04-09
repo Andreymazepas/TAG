@@ -1,6 +1,7 @@
 /*
 Projeto 1 de Teoria e Aplicacao de Grafos 2018/2
-Andrey Emmanuel Matrosov Mazépas - 16/0112362 
+Andrey Emmanuel Matrosov Mazépas - 16/0112362
+Kevin da Silva Souto - 16/0046688
 
 */
 
@@ -35,7 +36,7 @@ double mediaAglomeracao();
 
 int main() {
     // faz a leitura do arquivo GML para a estrutura NETWORK
-    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));    
+    mynetwork = (NETWORK *)malloc(sizeof(NETWORK));
     myfile = fopen("data/gmldata/karate.gml", "r");
     if (myfile == NULL){
         printf("Error opening file\n");
@@ -64,8 +65,8 @@ int main() {
     da_init(R);
     da_init(X);
     BronKerbosch(R, P, X); // algoritmo de BronKerbosch
-    
-    
+
+
     // (3) O Coeficiente de Aglomeração de cada vértice;
     printf("\n\n(3) O Coeficiente de Aglomeração de cada vértice\n");
     for(int i=0; i < mynetwork->nvertices; i++){
@@ -99,13 +100,13 @@ void BronKerbosch(intArray R, intArray P, intArray X){
         printf("%ld ", da_count(R));
         printIntArr(&R, "vertices"); //    report R as a maximal clique
     }
-    
+
     intArray P1; // faz uma copia de P
     da_init(P1);
     for(int i = 0; i < da_count(P); i++)
         da_add(P1, da_get(P,i));
-    
-    //        for each vertex v in P:    
+
+    //        for each vertex v in P:
     for(int i =0 ; i < da_count(P); i++)
     {
         int v = da_get(P, i);
@@ -122,17 +123,17 @@ void BronKerbosch(intArray R, intArray P, intArray X){
 double aglomeracao(VERTEX v){
     int grau = v.degree;
     intArray vizinhos;
-    da_init(vizinhos); 
+    da_init(vizinhos);
     vizinhos = Vizinhos(v.id -1);
     int links = 0;
-    
+
     // encontrar o numero de links entre os vizinhos
     for(int i = 0; i < da_count(vizinhos); i++)
     {
         for(int j = i+1; j < da_count(vizinhos); j++)
         {
             if(i != j && isVizinho(da_get(vizinhos,i)-1, da_get(vizinhos,j)-1))
-                links++;       
+                links++;
         }
     }
     //printf("id = %d ,links = %d, grau = %d\n", v.id,links, grau);
@@ -153,7 +154,7 @@ double mediaAglomeracao(){
     }
     mediaAglomeracao_ = (1.0 / nVertices) * mediaAglomeracao_;
     return mediaAglomeracao_;
-    
+
 }
 
 
@@ -173,7 +174,7 @@ intArray intersectionIntArr(intArray arr1, intArray arr2){
             }
         }
     }
-    return intersection;    
+    return intersection;
 }
 
 
@@ -206,7 +207,7 @@ intArray Vizinhos(int v){
 // checa se v1 e v2 são vizinhos
 int isVizinho(int v1, int v2){
     intArray v1Vizinhos = Vizinhos(v1);
-    
+
     for(int i = 0; i < da_count(v1Vizinhos); i++)
     {
         if(da_get(v1Vizinhos, i) == v2)
