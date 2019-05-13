@@ -28,6 +28,7 @@ DA_TYPEDEF(struct path, pathArray);
 void printIntArr(intArray *arr, const char *name);
 NETWORK *mynetwork; // estrutura onde será guardado o grafo
 FILE *myfile;       // arquivo GML
+FILE *saida;
 int stack[100];     // espaco em memoria para a pilha global
 int *sp;            // ponteiro da pilha
 int NVERTICES;      // numero maximo de vertices
@@ -35,27 +36,36 @@ int NVERTICES;      // numero maximo de vertices
 // funcao para imprimir toda o grafo
 void printNetwork()
 {
+    saida = fopen("./out/gerarImagemDAG.sh", "w+");
+    fprintf(saida, "echo 'digraph finite_state_machine {	rankdir=LR;\n"); 
     for (int i = 1; i < mynetwork->nvertices + 1; i++)
     {
         printf("Disciplina %s:\n", mynetwork->vertex[i - 1].label);
-        if (mynetwork->vertex[i - 1].degree == 0)
+        
+        if (mynetwork->vertex[i - 1].degree == 0){
+            fprintf(saida, "\"%s\";\n", mynetwork->vertex[i - 1].label);
             printf("\n");
-        else
-            printf("\t");
-        for (int j = 0; j < mynetwork->vertex[i - 1].degree; j++)
-        {
-            int target = mynetwork->vertex[i - 1].edge[j].target;
-            printf("%s", mynetwork->vertex[target].label);
-            if (j == mynetwork->vertex[i - 1].degree - 1)
+        }
+        else{
+            for (int j = 0; j < mynetwork->vertex[i - 1].degree; j++)
             {
-                printf("\n\n");
-            }
-            else
-            {
-                printf("; ");
+                int target = mynetwork->vertex[i - 1].edge[j].target;
+                printf("%s", mynetwork->vertex[target].label);
+                fprintf(saida, "\"%s\" -> \"%s\";\n", mynetwork->vertex[i - 1].label, mynetwork->vertex[target].label);
+                if (j == mynetwork->vertex[i - 1].degree - 1)
+                {
+                    printf("\n\n");
+                }
+                else
+                {
+                    printf("; ");
+                }
             }
         }
     }
+    fprintf(saida, "}' | dot -Tpng > imagemDAG.png");
+    fclose(saida);
+    printf("GERADO ARQUIVO /out/gerarImagemDAG.sh PARA CRIAR A IMAGEM\n");
 }
 
 //funcao simples para encontrar todos os vertices de origem do grafo
@@ -95,6 +105,7 @@ void DFS(int v_id, int visited[], int peso)
 {
     visited[v_id] = 1; // marca o atual como visitado
     VERTEX v = mynetwork->vertex[v_id];
+    printf("%d \n", v.weight);
     peso += v.weight;
 
     for (int i = 0; i < v.degree; i++)
