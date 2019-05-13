@@ -23,51 +23,55 @@ struct path
     int peso;
 };
 
-
 DA_TYPEDEF(int, intArray); //definindo tipo intarray
 DA_TYPEDEF(struct path, pathArray);
-void printIntArr(intArray* arr, const char* name);
+void printIntArr(intArray *arr, const char *name);
 NETWORK *mynetwork; // estrutura onde será guardado o grafo
-FILE *myfile; // arquivo GML
-int stack[100]; // espaco em memoria para a pilha global
-int *sp; // ponteiro da pilha
-int NVERTICES; // numero maximo de vertices
-
+FILE *myfile;       // arquivo GML
+int stack[100];     // espaco em memoria para a pilha global
+int *sp;            // ponteiro da pilha
+int NVERTICES;      // numero maximo de vertices
 
 // funcao para imprimir toda o grafo
-void printNetwork(){
-      for(int i=1; i< mynetwork->nvertices+1; i++){
-        printf("Disciplina %s:\n", mynetwork->vertex[i-1].label);
-        if(mynetwork->vertex[i-1].degree == 0)
+void printNetwork()
+{
+    for (int i = 1; i < mynetwork->nvertices + 1; i++)
+    {
+        printf("Disciplina %s:\n", mynetwork->vertex[i - 1].label);
+        if (mynetwork->vertex[i - 1].degree == 0)
             printf("\n");
         else
             printf("\t");
-        for(int j = 0; j < mynetwork->vertex[i-1].degree; j++)
+        for (int j = 0; j < mynetwork->vertex[i - 1].degree; j++)
         {
-            int target = mynetwork->vertex[i-1].edge[j].target;
+            int target = mynetwork->vertex[i - 1].edge[j].target;
             printf("%s", mynetwork->vertex[target].label);
-            if(j == mynetwork->vertex[i-1].degree-1){
-                printf("\n\n");}
-            else {
-                printf("; ");}
+            if (j == mynetwork->vertex[i - 1].degree - 1)
+            {
+                printf("\n\n");
+            }
+            else
+            {
+                printf("; ");
+            }
         }
-
     }
 }
 
-
 //funcao simples para encontrar todos os vertices de origem do grafo
-intArray encontraOrigens(){
+intArray encontraOrigens()
+{
 
     int arestasEntrada[NVERTICES];
-    for(int i=0; i<NVERTICES; i++){
-        arestasEntrada[i] =0;
+    for (int i = 0; i < NVERTICES; i++)
+    {
+        arestasEntrada[i] = 0;
     }
 
-    for(int i = 0; i < NVERTICES; i++)
+    for (int i = 0; i < NVERTICES; i++)
     {
         VERTEX v = mynetwork->vertex[i];
-        for(int j = 0; j < v.degree; j++)
+        for (int j = 0; j < v.degree; j++)
         {
             EDGE e = v.edge[j];
             arestasEntrada[e.target] = arestasEntrada[e.target] + 1;
@@ -77,66 +81,72 @@ intArray encontraOrigens(){
     intArray idsOrigem;
     da_init(idsOrigem);
 
-    for(int i = 0; i < NVERTICES; i++)
+    for (int i = 0; i < NVERTICES; i++)
     {
-        if(arestasEntrada[i]==0)
+        if (arestasEntrada[i] == 0)
             da_add(idsOrigem, i);
     }
 
     return idsOrigem;
 }
 
-
 // simples DFS para encontrar folhas de um certo no
-void DFS(int v_id, int visited[], int peso){
+void DFS(int v_id, int visited[], int peso)
+{
     visited[v_id] = 1; // marca o atual como visitado
     VERTEX v = mynetwork->vertex[v_id];
     peso += v.weight;
 
-    for(int i = 0; i < v.degree; i++){
-        VERTEX adj  = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
-        if (!visited[adj.id]){
+    for (int i = 0; i < v.degree; i++)
+    {
+        VERTEX adj = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
+        if (!visited[adj.id])
+        {
             DFS(adj.id, visited, peso);
         }
     }
-    if(v.degree == 0){
+    if (v.degree == 0)
+    {
         push(sp, v_id);
         push(sp, peso);
     }
-    return ;
+    return;
 }
 
-
 // funcao para imprimir um caminho critico baseado nos pesos de cada materia
-void printCP(){
+void printCP()
+{
     intArray origens = encontraOrigens();
     pathArray maxPaths;
     da_init(maxPaths);
     // itera sobre todos os nos de origem para encontrar as folhas e o caminho
     // mais pesado entre origem -> folha
-    for(int i =0; i < da_count(origens); i++){
+    for (int i = 0; i < da_count(origens); i++)
+    {
         sp = stack;
         int visited[NVERTICES];
 
-        for(int i = 0; i < NVERTICES; i++)
+        for (int i = 0; i < NVERTICES; i++)
             visited[i] = 0;
 
         intArray folhas;
         da_init(folhas);
         DFS(i, visited, 0); // encontra as folhas
 
-        while(sp != stack){
+        while (sp != stack)
+        {
             da_add(folhas, pop(sp));
         }
 
         int maxPeso = 0;
         int idmaxPeso = 0;
         // ve qual o caminho de maior peso de origem ate a folha
-        for(int i = 0; i < da_count(folhas); i+=2)
+        for (int i = 0; i < da_count(folhas); i += 2)
         {
-            if(da_get(folhas, i) > maxPeso){
+            if (da_get(folhas, i) > maxPeso)
+            {
                 maxPeso = da_get(folhas, i);
-                idmaxPeso = da_get(folhas, i+1);
+                idmaxPeso = da_get(folhas, i + 1);
             }
         }
         struct path path1;
@@ -144,33 +154,36 @@ void printCP(){
         path1.destino = idmaxPeso;
         path1.peso = maxPeso;
         da_add(maxPaths, path1);
-
     }
-   // ve todos os nos analisados e o peso encontrado
+    // ve todos os nos analisados e o peso encontrado
     int maxPeso = 0;
     int idmaxPeso = 0;
-    for(int i =0; i < da_count(maxPaths);i++){
+    for (int i = 0; i < da_count(maxPaths); i++)
+    {
         struct path path1 = da_get(maxPaths, i);
-        if(path1.peso > maxPeso){
+        if (path1.peso > maxPeso)
+        {
             maxPeso = path1.peso;
             idmaxPeso = i;
         }
     }
     struct path pesoMAX = da_get(maxPaths, idmaxPeso);
     printf("CAMINHO DE MAIOR PESO:\n");
-    printf("%s -> %s : PESO %d\n", mynetwork->vertex[pesoMAX.origem].label,  mynetwork->vertex[pesoMAX.destino].label, pesoMAX.peso );
+    printf("%s -> %s : PESO %d\n", mynetwork->vertex[pesoMAX.origem].label, mynetwork->vertex[pesoMAX.destino].label, pesoMAX.peso);
     return;
-
 }
 
 // funcao auxiliar para encontrar um caminho topologico
-void topologicalRecursive(int v_id, int visited[]){
+void topologicalRecursive(int v_id, int visited[])
+{
     visited[v_id] = 1; // marca o atual como visitado
     VERTEX v = mynetwork->vertex[v_id];
 
-    for(int i = 0; i < v.degree; i++){
-        VERTEX adj  = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
-        if (!visited[adj.id]){
+    for (int i = 0; i < v.degree; i++)
+    {
+        VERTEX adj = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
+        if (!visited[adj.id])
+        {
             topologicalRecursive(adj.id, visited);
         }
     }
@@ -178,36 +191,39 @@ void topologicalRecursive(int v_id, int visited[]){
     push(sp, v_id);
 }
 
-void printTopologicalOrder(){
+void printTopologicalOrder()
+{
 
     sp = stack; // inicializa a pilha
     int visited[NVERTICES];
 
-    for(int i = 0; i < NVERTICES; i++)
+    for (int i = 0; i < NVERTICES; i++)
         visited[i] = 0;
 
     // itera sobre todos os nos para realizar a ordenacao topologica
-    for(int i=0; i< NVERTICES; i++){
+    for (int i = 0; i < NVERTICES; i++)
+    {
         VERTEX v = mynetwork->vertex[i];
-        if(visited[v.id] == 0){
+        if (visited[v.id] == 0)
+        {
             topologicalRecursive(v.id, visited);
         }
     }
     // iomprime o conteudo da stack em ordem
-    while(sp != stack){
+    while (sp != stack)
+    {
         printf("%s\n", mynetwork->vertex[pop(sp)].label);
     }
-
 }
 
-
-int main() {
-
+int main()
+{
 
     // faz a leitura do arquivo GML para a estrutura NETWORK
     mynetwork = (NETWORK *)malloc(sizeof(NETWORK));
     myfile = fopen("data/Untitled.gml", "r");
-    if (myfile == NULL){
+    if (myfile == NULL)
+    {
         printf("Error opening file\n");
         return -1;
     }
@@ -216,8 +232,8 @@ int main() {
 
     NVERTICES = mynetwork->nvertices;
 
-    int choice=0;
-    while(choice!='4')
+    int choice = 0;
+    while (choice != '4')
     {
         printf("\n\tFluxo do curso: Ciencias da Computacao");
         printf("\n\t------------------------------");
@@ -227,42 +243,40 @@ int main() {
         printf("\n\t 4. Sair");
         printf("\n\n Entre com a opcao: ");
         choice = getchar();
-        switch(choice)
+        switch (choice)
         {
         case '1':
-        printf("\n\n");
-        printNetwork();
-        printf("Pressione uma tecla para voltar ao menu\n");
-        (void)getchar();
-        break;
+            printf("\n\n");
+            printNetwork();
+            printf("Pressione uma tecla para voltar ao menu\n");
+            (void)getchar();
+            break;
         case '2':
-        printf("\n\n");
-        printTopologicalOrder();
-        break;
+            printf("\n\n");
+            printTopologicalOrder();
+            break;
         case '3':
-        printf("\n\n");
-        printCP();
-        break;
+            printf("\n\n");
+            printCP();
+            break;
         case '4':
-        printf("\n\n");
-        break;
+            printf("\n\n");
+            break;
         default:
-        printf("\n\nOpcao invalida...Tente novamente\n");
+            printf("\n\nOpcao invalida...Tente novamente\n");
         }
         (void)getchar();
     }
     return 0;
 }
 
-
 // funcao auxiliar para imprimir intArray
-void printIntArr(intArray* arr, const char* name)
- {
-     printf("%s = {", name);
-     if(da_count(*arr) > 0)
-         printf(" %d", arr->p[0]);
-     for(int i=1; i<da_count(*arr); ++i)
-         printf(", %d", arr->p[i]);
-     printf(" }\n");
- }
-
+void printIntArr(intArray *arr, const char *name)
+{
+    printf("%s = {", name);
+    if (da_count(*arr) > 0)
+        printf(" %d", arr->p[0]);
+    for (int i = 1; i < da_count(*arr); ++i)
+        printf(", %d", arr->p[i]);
+    printf(" }\n");
+}
