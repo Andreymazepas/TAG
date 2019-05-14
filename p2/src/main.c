@@ -36,14 +36,13 @@ int NVERTICES;      // numero maximo de vertices
 // funcao para imprimir toda o grafo
 void printNetwork()
 {
-    saida = fopen("./out/gerarImagemDAG.sh", "w+");
-    fprintf(saida, "echo 'digraph finite_state_machine {	rankdir=LR;\n"); 
+    fprintf(saida, "echo 'digraph DAG {	rankdir=LR; node[style=filled];\n"); 
     for (int i = 1; i < mynetwork->nvertices + 1; i++)
     {
         printf("Disciplina %s:\n", mynetwork->vertex[i - 1].label);
         
         if (mynetwork->vertex[i - 1].degree == 0){
-            fprintf(saida, "\"%s\";\n", mynetwork->vertex[i - 1].label);
+            fprintf(saida, "\"%s (%d)\";\n", mynetwork->vertex[i - 1].label, mynetwork->vertex[i-1].weight);
             printf("\n");
         }
         else{
@@ -51,7 +50,7 @@ void printNetwork()
             {
                 int target = mynetwork->vertex[i - 1].edge[j].target;
                 printf("%s", mynetwork->vertex[target].label);
-                fprintf(saida, "\"%s\" -> \"%s\";\n", mynetwork->vertex[i - 1].label, mynetwork->vertex[target].label);
+                fprintf(saida, "\"%s (%d)\" -> \"%s (%d)\";\n", mynetwork->vertex[i - 1].label, mynetwork->vertex[i - 1].weight,  mynetwork->vertex[target].label, mynetwork->vertex[target].weight);
                 if (j == mynetwork->vertex[i - 1].degree - 1)
                 {
                     printf("\n\n");
@@ -63,9 +62,7 @@ void printNetwork()
             }
         }
     }
-    fprintf(saida, "}' | dot -Tpng > imagemDAG.png");
-    fclose(saida);
-    printf("GERADO ARQUIVO /out/gerarImagemDAG.sh PARA CRIAR A IMAGEM\n");
+   
 }
 
 //funcao simples para encontrar todos os vertices de origem do grafo
@@ -105,7 +102,6 @@ void DFS(int v_id, int visited[], int peso)
 {
     visited[v_id] = 1; // marca o atual como visitado
     VERTEX v = mynetwork->vertex[v_id];
-    printf("%d \n", v.weight);
     peso += v.weight;
 
     for (int i = 0; i < v.degree; i++)
@@ -122,6 +118,30 @@ void DFS(int v_id, int visited[], int peso)
         push(sp, peso);
     }
     return;
+}
+
+// funcao para encontrar recursivamente o caminho entre origem e destino
+int backflowDFS(int v_id, int visited[], int destination){
+    visited[v_id] = 1; // marca o atual como visitado
+    VERTEX v = mynetwork->vertex[v_id];
+    int result = 0;
+
+    for (int i = 0; i < v.degree; i++)
+    {
+        VERTEX adj = mynetwork->vertex[v.edge[i].target]; // vertice adjacente ao atual
+        if (!visited[adj.id])
+        {
+            result = backflowDFS(adj.id, visited, destination);
+            if(result){
+                push(sp, v_id);
+            }
+        }
+    }
+    if (v_id == destination)
+    {
+        return 1;
+    }
+    return result;
 }
 
 // funcao para imprimir um caminho critico baseado nos pesos de cada materia
@@ -179,8 +199,41 @@ void printCP()
         }
     }
     struct path pesoMAX = da_get(maxPaths, idmaxPeso);
-    printf("CAMINHO DE MAIOR PESO:\n");
-    printf("%s -> %s : PESO %d\n", mynetwork->vertex[pesoMAX.origem].label, mynetwork->vertex[pesoMAX.destino].label, pesoMAX.peso);
+
+    sp = stack;
+    int visited[NVERTICES];
+
+    for (int i = 0; i < NVERTICES; i++)
+            visited[i] = 0;
+    backflowDFS(pesoMAX.origem, visited, pesoMAX.destino);
+
+    printf("\n\nCAMINHO DE MAIOR PESO:\n");
+            printf("\n\t------------------------------\n");
+
+    int pesototal = 0;
+    printf("%s (%d) -> %s (%d) -> ", mynetwork->vertex[pesoMAX.origem].label, mynetwork->vertex[pesoMAX.origem].weight,
+    mynetwork->vertex[mynetwork->vertex[pesoMAX.origem].edge[0].target].label,
+    mynetwork->vertex[mynetwork->vertex[pesoMAX.origem].edge[0].target].weight);
+    fprintf(saida, "\"%s (%d)\" [color=red];\n", mynetwork->vertex[pesoMAX.origem].label, mynetwork->vertex[pesoMAX.origem].weight);
+    fprintf(saida, "\"%s (%d)\" [color=red];\n", mynetwork->vertex[mynetwork->vertex[pesoMAX.origem].edge[0].target].label, 
+    mynetwork->vertex[mynetwork->vertex[pesoMAX.origem].edge[0].target].weight);
+
+    pesototal += mynetwork->vertex[pesoMAX.origem].weight;
+
+    while (sp != stack)
+        {
+            int pop = pop(sp);
+            printf("%s (%d) -> ", mynetwork->vertex[pop].label, mynetwork->vertex[pop].weight);
+            fprintf(saida, "\"%s (%d)\" [color=red];\n", mynetwork->vertex[pop].label, mynetwork->vertex[pop].weight);
+
+            pesototal += mynetwork->vertex[pop].weight;
+        }
+    printf("%s (%d)\n", mynetwork->vertex[pesoMAX.destino].label, mynetwork->vertex[pesoMAX.destino].weight);
+    fprintf(saida, "\"%s (%d)\" [color=red];", mynetwork->vertex[pesoMAX.destino].label, mynetwork->vertex[pesoMAX.destino].weight);
+
+    pesototal += mynetwork->vertex[pesoMAX.destino].weight;
+
+    printf("PESO %d\n", pesototal);
     return;
 }
 
@@ -241,43 +294,24 @@ int main()
     read_network(mynetwork, myfile);
     fclose(myfile);
 
+    saida = fopen("./out/gerarImagemDAG.sh", "w+");
+
     NVERTICES = mynetwork->nvertices;
 
-    int choice = 0;
-    while (choice != '4')
-    {
         printf("\n\tFluxo do curso: Ciencias da Computacao");
-        printf("\n\t------------------------------");
-        printf("\n\n\t 1. Imprimir DAG");
-        printf("\n\t 2. Imprimir Ordenacao Topologica");
-        printf("\n\t 3. Imprimir Caminho Critico");
-        printf("\n\t 4. Sair");
-        printf("\n\n Entre com a opcao: ");
-        choice = getchar();
-        switch (choice)
-        {
-        case '1':
-            printf("\n\n");
+        printf("\n\t------------------------------\n");
             printNetwork();
-            printf("Pressione uma tecla para voltar ao menu\n");
-            (void)getchar();
-            break;
-        case '2':
-            printf("\n\n");
+        printf("\nOrdem Topológica:\n");
+                printf("\n\t------------------------------\n");
+
             printTopologicalOrder();
-            break;
-        case '3':
-            printf("\n\n");
             printCP();
-            break;
-        case '4':
-            printf("\n\n");
-            break;
-        default:
-            printf("\n\nOpcao invalida...Tente novamente\n");
-        }
-        (void)getchar();
-    }
+         fprintf(saida, "}' | dot -Tpng > imagemDAG.png");
+        fclose(saida);
+                printf("\n\t------------------------------\n");
+
+        printf("GERADO ARQUIVO /out/gerarImagemDAG.sh PARA CRIAR A IMAGEM\n");
+          
     return 0;
 }
 
