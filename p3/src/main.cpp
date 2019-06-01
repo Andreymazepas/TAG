@@ -34,85 +34,85 @@ Professor Professores[100];
 Escola Escolas[50];
 
 
-void ocupaEscola(int id){
-    if(Escolas[id].vagas == 1){
-        Escolas[id].vagasOcupadas++;
-        escolasComProf++;
-    } else {
-        if(Escolas[id].vagasOcupadas > 0){
-            Escolas[id].vagasOcupadas++;
-        }
-        else{
-            Escolas[id].vagasOcupadas++;
-            escolasComProf++;
-        }
-    }
-}
+// void ocupaEscola(int id){
+//     if(Escolas[id].vagas == 1){
+//         Escolas[id].vagasOcupadas++;
+//         escolasComProf++;
+//     } else {
+//         if(Escolas[id].vagasOcupadas > 0){
+//             Escolas[id].vagasOcupadas++;
+//         }
+//         else{
+//             Escolas[id].vagasOcupadas++;
+//             escolasComProf++;
+//         }
+//     }
+// }
 
-void algoritmoGaleShapley() {
-    int loop = 1;
-    while(loop){
-        loop = 0;
-        for(int i = 0; i < NUMERO_PROFESSORES; i++)
-        {
+// void algoritmoGaleShapley() {
+//     int loop = 1;
+//     while(loop){
+//         loop = 0;
+//         for(int i = 0; i < NUMERO_PROFESSORES; i++)
+//         {
             
-            Professor profAtual = Professores[i];
-            if(profAtual.escola == 0) {
+//             Professor profAtual = Professores[i];
+//             if(profAtual.escola == 0) {
                 
-                for(int j = 0; j < 5; j++)
-                {
-                    Escola escolaPref = Escolas[profAtual.preferencias[j] -1];
-                    if(profAtual.habilitacao - escolaPref.habilitacao1 >= profAtual.habilitacao - escolaPref.habilitacao2){
-                        if(Escolas[profAtual.preferencias[j] -1].professor1 == 0){
-                            Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
-                            Professores[i].escola = escolaPref.id;
-                            professoresOcupados++;
-                            ocupaEscola(escolaPref.id);
-                            loop = 1;
-                            printf("professor %d ocupou escola %d na vaga 1\n", profAtual.id, escolaPref.id);
-                            printf("preferencia: %d escola %d\n", profAtual.preferencias[j], Escolas[profAtual.preferencias[j]-1].id);
-                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);
-                            break;
-                        } else if(profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] -1].professor1 - 1].habilitacao){
-                            printf("professor %d ocupou escola %d no lugar de %d na vaga 1\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1 -1].id);
-                            Professores[i].escola = escolaPref.id;
-                            Professores[Escolas[profAtual.preferencias[j]-1].professor1 -1].escola = 0;
-                            Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
-                            loop = 1;
-                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);                            
-                            break;
-                        }
-                    } 
-                    if (profAtual.habilitacao - escolaPref.habilitacao1 < profAtual.habilitacao - escolaPref.habilitacao2){
-                        if(Escolas[profAtual.preferencias[j] -1].professor2 == 0){
-                            Escolas[profAtual.preferencias[j]-1].professor2 = profAtual.id;
-                            Professores[i].escola = escolaPref.id;
-                            professoresOcupados++;
-                            ocupaEscola(escolaPref.id);
-                            printf("professor %d ocupou escola %d na vaga 2\n", profAtual.id, escolaPref.id);
-                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor2);
-                            loop = 1;
-                            break;
-                        } else if(profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] -1].professor2-1].habilitacao){
-                            printf("professor %d ocupou escola %d no lugar de %d na vaga 2\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1-1].id);
-                            Professores[i].escola = escolaPref.id;
-                            Professores[Escolas[profAtual.preferencias[j] -1].professor2-1].escola = 0;
-                            Escolas[profAtual.preferencias[j]-1].professor2 = profAtual.id;
-                            loop = 1;
-                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor2);
-                            break;
-                        }
-                    }
-                }
+//                 for(int j = 0; j < 5; j++)
+//                 {
+//                     Escola escolaPref = Escolas[profAtual.preferencias[j] -1];
+//                     if(profAtual.habilitacao - escolaPref.habilitacao1 >= profAtual.habilitacao - escolaPref.habilitacao2){
+//                         if(Escolas[profAtual.preferencias[j] -1].professor1 == 0){
+//                             Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
+//                             Professores[i].escola = escolaPref.id;
+//                             professoresOcupados++;
+//                             ocupaEscola(escolaPref.id);
+//                             loop = 1;
+//                             printf("professor %d ocupou escola %d na vaga 1\n", profAtual.id, escolaPref.id);
+//                             printf("preferencia: %d escola %d\n", profAtual.preferencias[j], Escolas[profAtual.preferencias[j]-1].id);
+//                             printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);
+//                             break;
+//                         } else if(profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] -1].professor1 - 1].habilitacao){
+//                             printf("professor %d ocupou escola %d no lugar de %d na vaga 1\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1 -1].id);
+//                             Professores[i].escola = escolaPref.id;
+//                             Professores[Escolas[profAtual.preferencias[j]-1].professor1 -1].escola = 0;
+//                             Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
+//                             loop = 1;
+//                             printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);                            
+//                             break;
+//                         }
+//                     } 
+//                     if (profAtual.habilitacao - escolaPref.habilitacao1 < profAtual.habilitacao - escolaPref.habilitacao2){
+//                         if(Escolas[profAtual.preferencias[j] -1].professor2 == 0){
+//                             Escolas[profAtual.preferencias[j]-1].professor2 = profAtual.id;
+//                             Professores[i].escola = escolaPref.id;
+//                             professoresOcupados++;
+//                             ocupaEscola(escolaPref.id);
+//                             printf("professor %d ocupou escola %d na vaga 2\n", profAtual.id, escolaPref.id);
+//                             printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor2);
+//                             loop = 1;
+//                             break;
+//                         } else if(profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] -1].professor2-1].habilitacao){
+//                             printf("professor %d ocupou escola %d no lugar de %d na vaga 2\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1-1].id);
+//                             Professores[i].escola = escolaPref.id;
+//                             Professores[Escolas[profAtual.preferencias[j] -1].professor2-1].escola = 0;
+//                             Escolas[profAtual.preferencias[j]-1].professor2 = profAtual.id;
+//                             loop = 1;
+//                             printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor2);
+//                             break;
+//                         }
+//                     }
+//                 }
                 
                 
-            }
-        }
-        if(!loop)
-            break;
+//             }
+//         }
+//         if(!loop)
+//             break;
         
-    }
-}
+//     }
+// }
 
 void imprimeProfessores(){
     
@@ -149,7 +149,6 @@ int lerArquivo(){
         Professores[i].preferencias[2] = e3;
         Professores[i].preferencias[3] = e4;
         Professores[i].preferencias[4] = e5;
-        Professores[i].escola = 0;
     }
 
     for(int i=0; i<NUMERO_ESCOLAS; i++){
@@ -180,8 +179,8 @@ int main(void) {
 
     if(!lerArquivo())
         return 0;
-    algoritmoGaleShapley();
-    algoritmoGaleShapley();
+    // algoritmoGaleShapley();
+    // algoritmoGaleShapley();
 
     imprimeProfessores();
     
