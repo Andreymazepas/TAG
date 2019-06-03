@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #define PROFESSORES_OFFSET -1
 #define ESCOLAS_OFFSET 99
 #define NUMERO_PROFESSORES 100
@@ -26,8 +27,8 @@ struct Professor {
 //globais
 int professoresOcupados = 0;
 int escolasComProf = 0;
-Professor Professores[100];
-Escola Escolas[50];
+struct Professor Professores[100];
+struct Escola Escolas[50];
 
 
 void ocupaEscola(int id){
@@ -51,7 +52,7 @@ void algoritmoGaleShapley() {
         loop = 0;
         for(int i = 0; i < NUMERO_PROFESSORES; i++)
         {
-            Professor profAtual = Professores[i];
+            struct Professor profAtual = Professores[i];
             //professor nao alocado
             if(profAtual.escola == 0) {
                 //iterar sobre as preferencias dele
@@ -61,7 +62,7 @@ void algoritmoGaleShapley() {
                     // se a preferencia for 0, rompe loop
                     if(profAtual.preferencias[j] == 0)
                         break;
-                    Escola escolaPref = Escolas[profAtual.preferencias[j] -1];
+                    struct Escola escolaPref = Escolas[profAtual.preferencias[j] -1];
                     if(profAtual.habilitacao >= escolaPref.habilitacao1){
                         if(Escolas[profAtual.preferencias[j] -1].professor1 == 0){
                             Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
@@ -79,7 +80,7 @@ void algoritmoGaleShapley() {
                             Professores[Escolas[profAtual.preferencias[j]-1].professor1 -1].escola = 0;
                             Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
                             loop = 1;
-                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);                            
+                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);
                             break;
                         }
                     }
@@ -114,7 +115,7 @@ void algoritmoGaleShapley() {
 void imprimeProfessores(){
     for(int i = 0; i < NUMERO_PROFESSORES; i++)
     {
-        Professor profAtual = Professores[i];
+        struct Professor profAtual = Professores[i];
         if (profAtual.escola == 0){
             //printf("Professor %d sem escola\n", profAtual.id);
         }
@@ -164,9 +165,8 @@ int lerArquivo(){
 }
 
 int main(void) {
+    if (!lerArquivo()) return 0;
 
-    if(!lerArquivo())
-        return 0;
     algoritmoGaleShapley();
     imprimeProfessores();
 

@@ -1,7 +1,8 @@
-CC=g++
+CC=gcc
 ODIR = obj
 SDIR = src
 INC = -Isrc -Ilib
-CFLAGS= -Wall 
+CFLAGS= -Wall
+
 main:
-	$(CC) $(INC) -g src/main.cpp -o p3 $(CLAGS)
+	$(CC) $(INC) -g src/main.c -o p3 $(CLAGS)
