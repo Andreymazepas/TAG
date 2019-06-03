@@ -114,13 +114,14 @@ void imprimeProfessores() {
         struct Professor profAtual = Professores[i];
 
         if (profAtual.escola == 0) {
-            //printf("Professor %d sem escola\n", profAtual.id);
+            // printf("Professor %d sem escola\n", profAtual.id);
         } else {
             printf("Professor %d -> Escola %d\n", profAtual.id, profAtual.escola);
         }
     }
 
-    printf("Professores Ocupados: %d\n Escolas com ao menos 1 professor: %d\n", professoresOcupados, escolasComProf);
+    printf("Professores Ocupados: %d\n", professoresOcupados);
+    printf("Escolas com ao menos 1 professor: %d\n", escolasComProf);
 }
 
 int lerArquivo() {
@@ -146,7 +147,6 @@ int lerArquivo() {
     for (int i = 0; i < NUMERO_ESCOLAS; i++) {
         int escola, vaga1, vaga2;
         fscanf(fp, "(E%d):(%d):(%d)\n", &escola, &vaga1, &vaga2);
-        // da_set(habilitacoes, escola + ESCOLAS_OFFSET, habilitacao);
 
         Escolas[i].id = escola;
         Escolas[i].habilitacao1 = vaga1;
@@ -165,7 +165,7 @@ int lerArquivo() {
 }
 
 int main(void) {
-    if (!lerArquivo()) return 0;
+    if (!lerArquivo()) return 1;
 
     algoritmoGaleShapley();
     imprimeProfessores();
