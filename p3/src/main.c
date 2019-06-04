@@ -50,62 +50,62 @@ void algoritmoGaleShapley() {
         loop = 0;
 
         for (int i = 0; i < NUMERO_PROFESSORES; i++) {
-            struct Professor profAtual = Professores[i];
+            struct Professor *profAtual = &Professores[i];
+
             // professor nao alocado
-            if(profAtual.escola == 0) {
+            if(profAtual->escola == 0) {
                 // iterar sobre as preferencias dele
                 for (int j = 0; j < 4; j++) {
                     // alguns professores tem menos que 5 preferencias
                     // se a preferencia for 0, rompe loop
-                    if (profAtual.preferencias[j] == 0) break;
+                    if (profAtual->preferencias[j] == 0) break;
+                    struct Escola *escolaPref = &Escolas[profAtual->preferencias[j] - 1];
 
-                    struct Escola escolaPref = Escolas[profAtual.preferencias[j] -1];
-                    if (profAtual.habilitacao >= escolaPref.habilitacao1) {
-                        if (Escolas[profAtual.preferencias[j] -1].professor1 == 0) {
-                            Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
-                            Professores[i].escola = escolaPref.id;
+                    if (profAtual->habilitacao >= escolaPref->habilitacao1) {
+                        if (escolaPref->professor1 == 0) {
+                            escolaPref->professor1 = profAtual->id;
+                            profAtual->escola = escolaPref->id;
                             professoresOcupados++;
-                            ocupaEscola(escolaPref.id);
+                            ocupaEscola(escolaPref->id);
                             loop = 1;
-                            printf("professor %d ocupou escola %d na vaga 1\n", profAtual.id, escolaPref.id);
-                            printf("preferencia: %d escola %d\n", profAtual.preferencias[j], Escolas[profAtual.preferencias[j]-1].id);
-                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);
+                            printf("professor %d ocupou escola %d na vaga 1\n", profAtual->id, escolaPref->id);
+                            printf("preferencia: %d escola %d\n", profAtual->preferencias[j], escolaPref->id);
+                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", profAtual->id, profAtual->escola, escolaPref->id, escolaPref->professor1);
                             break;
-                        } else if (profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] -1].professor1 - 1].habilitacao) {
-                            printf("professor %d ocupou escola %d no lugar de %d na vaga 1\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1 -1].id);
-                            Professores[i].escola = escolaPref.id;
-                            Professores[Escolas[profAtual.preferencias[j]-1].professor1 -1].escola = 0;
-                            Escolas[profAtual.preferencias[j]-1].professor1 = profAtual.id;
+                        } else if (profAtual->habilitacao > Professores[escolaPref->professor1 - 1].habilitacao) {
+                            printf("professor %d ocupou escola %d no lugar de %d na vaga 1\n", profAtual->id, escolaPref->id, Professores[escolaPref->professor1 -1].id);
+                            profAtual->escola = escolaPref->id;
+                            Professores[escolaPref->professor1 -1].escola = 0;
+                            escolaPref->professor1 = profAtual->id;
                             loop = 1;
-                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor1);
+                            printf("professor %d: escola = %d\n escola %d: professor1 %d\n", profAtual->id, profAtual->escola, escolaPref->id, escolaPref->professor1);
                             break;
                         }
                     }
-                    if (profAtual.habilitacao >= escolaPref.habilitacao2 && escolaPref.vagas > 1) {
-                        if (Escolas[profAtual.preferencias[j] - 1].professor2 == 0) {
-                            Escolas[profAtual.preferencias[j] - 1].professor2 = profAtual.id;
-                            Professores[i].escola = escolaPref.id;
+
+                    if (profAtual->habilitacao >= escolaPref->habilitacao2 && escolaPref->vagas > 1) {
+                        if (escolaPref->professor2 == 0) {
+                            escolaPref->professor2 = profAtual->id;
+                            profAtual->escola = escolaPref->id;
                             professoresOcupados++;
-                            ocupaEscola(escolaPref.id);
-                            printf("professor %d ocupou escola %d na vaga 2\n", profAtual.id, escolaPref.id);
-                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j] - 1].id, Escolas[profAtual.preferencias[j] - 1].professor2);
+                            ocupaEscola(escolaPref->id);
+                            printf("professor %d ocupou escola %d na vaga 2\n", profAtual->id, escolaPref->id);
+                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", profAtual->id, profAtual->escola, escolaPref->id, escolaPref->professor2);
                             loop = 1;
                             break;
-                        } else if (profAtual.habilitacao > Professores[Escolas[profAtual.preferencias[j] - 1].professor2 - 1].habilitacao) {
-                            printf("professor %d ocupou escola %d no lugar de %d na vaga 2\n", profAtual.id, escolaPref.id, Professores[Escolas[profAtual.preferencias[j] -1].professor1-1].id);
-                            Professores[i].escola = escolaPref.id;
-                            Professores[Escolas[profAtual.preferencias[j] - 1].professor2 - 1].escola = 0;
-                            Escolas[profAtual.preferencias[j] - 1].professor2 = profAtual.id;
+                        } else if (profAtual->habilitacao > Professores[escolaPref->professor2 - 1].habilitacao) {
+                            printf("professor %d ocupou escola %d no lugar de %d na vaga 2\n", profAtual->id, escolaPref->id, Professores[escolaPref->professor1-1].id);
+                            profAtual->escola = escolaPref->id;
+                            Professores[escolaPref->professor2 - 1].escola = 0;
+                            escolaPref->professor2 = profAtual->id;
                             loop = 1;
-                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", Professores[i].id, Professores[i].escola, Escolas[profAtual.preferencias[j]-1].id, Escolas[profAtual.preferencias[j]-1].professor2);
+                            printf("professor %d: escola = %d\n escola %d: professor2 %d\n", profAtual->id, profAtual->escola, escolaPref->id, escolaPref->professor2);
                             break;
                         }
                     }
                 }
             }
         }
-
-        if (!loop) break;
     }
 }
 
