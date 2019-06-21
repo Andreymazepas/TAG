@@ -1,18 +1,3 @@
-Trabalho 4 da disciplina Teoria e Aplicação de Grafos 2018/2
+Trabalho 4 da disciplina Teoria e Aplicação de Grafos 2019/1
 Andrey Emmanuel Matrosov Mazépas 16/0112362
-Pedro Eugênio Guimarães Carvalho 14/0158197
-
-	Basta dar o comando "make" e executar o programa "./p4"
-
-	O algoritmo foi implementado conforme descrito no artigo. Infelizmente, mesmo com todas as otimizações, o tempo para calcular todas as 25 mil arestas do arquivo de emails em milhões de interações se mostrou muito grande, com mais de 30 segundos por interação e horas para encontrar as 42 comunidades.
-    
-    Entretanto, o algoritmo se mostrou eficiente quando o número de vértices é menor que 50. No código atual, ele está calculando as comunidades do grafo "Karate Club" do primeiro trabalho, pois este exemplo se encontra no artigo. Também foi possível verificar que o dendograma bate perfeitamente com os resultados obtidos.
-    
-    A maior dificuldade do trabalho foi entender os critérios de parada, pois não ficou claro o motivo de juntar comunidades quando o decréscimo na modularidade era o menor possível.
-    
-    A cada passo ele mostra o valor do somatorio atual das modularidades, o qual aumenta conforme as comunidades se juntam; e, além disso, também mostra quais comunidades se juntaram.
-    Ao final, são exibidos o total de comunidades encontradas e seus componentes.
-    
-    Os cálculos do karate club realizados pelo algoritmo foram acompanhados pelo dendograma do artigo e por cálculos a mão para garantir que estavam corretos. Além dele, foram feitos outros exemplos de grafos com comunidades.
-	
-    O resultado do programa mostrou que no fim foram encontradas 3 comunidades em vez das 2 descritas no artigo. Se houver a fusão das duas primeiras comunidades do programa,o resultado seria igual ao do artigo, porém o valor da modularidade total diminuiria, entrando no quadro de "menor decrescimo possivel", que nao foi implementado pois não é claro o critério de parada quando esse quadro é levado em conta.
+Kevin da Silva Souto
