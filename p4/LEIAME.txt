@@ -1,3 +1,6 @@
 Trabalho 4 da disciplina Teoria e Aplicação de Grafos 2019/1
 Andrey Emmanuel Matrosov Mazépas 16/0112362
 Kevin da Silva Souto
+
+Caso não conste a biblioteca ncurses no sistema, instalar com o seguinte comando:
+ $sudo apt-get install libncurses5-dev libncursesw5-dev
