@@ -14,6 +14,7 @@ int getposY(int Y);
 void draw_board(int x, int y); //desenha a tela, selecionando onde esta o cursor
 void initialize_board(); // inicializa a matriz do jogo;
 int possuiIgual(int x, int y); //checa se possui numero igual na col/linha/quadrado;
+void geraSolucao(); //Gera o passo-a-passo da solução do sudoku
 
 int sudokuInitial[9][9] =  {{1, 0, 0,    0, 0, 0,   0, 0, 0},
                             {0, 2, 0,    0, 0, 0,   0, 0, 0},
@@ -26,6 +27,22 @@ int sudokuInitial[9][9] =  {{1, 0, 0,    0, 0, 0,   0, 0, 0},
                             {0, 0, 0,    0, 0, 0,   7, 0, 0},
                             {0, 0, 0,    0, 0, 0,   0, 8, 0},
                             {0, 0, 0,    0, 0, 0,   0, 0, 9}};
+
+/*int sudokuInitial[9][9] =  {{8, 0, 0,    1, 5, 0,   6, 0, 0},
+                            {0, 0, 0,    3, 0, 0,   0, 4, 1},
+                            {5, 0, 0,    0, 0, 0,   7, 0, 0},
+                            
+                            {0, 0, 0,    0, 0, 9,   0, 6, 2},
+                            {0, 0, 0,    0, 3, 0,   0, 0, 0},
+                            {1, 4, 0,    8, 0, 0,   0, 0, 0},
+                            
+                            {0, 0, 8,    0, 0, 0,   0, 0, 9},
+                            {2, 9, 0,    0, 0, 1,   0, 0, 0},
+                            {0, 0, 5,    0, 9, 7,   0, 0, 6}};*/
+
+
+
+
 int sudoku[9][9];
 
 
@@ -88,6 +105,7 @@ int main(void)
     mvaddstr(5, 30, "Q para sair");
     mvaddstr(6, 30, "X ou Backspace para apagar");
     mvaddstr(7, 30, "R para reiniciar");
+    mvaddstr(8, 30, "C para apresentar a solução");
 
 
 
@@ -145,6 +163,10 @@ int main(void)
         case 'r':
         case 'R':
             initialize_board();
+            break;
+        case 'c':
+        case 'C':
+            geraSolucao();
             break;
         }
 
@@ -246,4 +268,27 @@ int possuiIgual(int x, int y){
     }
     
     return 0;
+}
+
+void geraSolucao(){
+    int x, y, n;
+
+    for(x = 0; x < 9; x++){
+        for(y = 0; y < 9; y++){ //Percorre o Grafo
+            if(!sudokuInitial[x][y]){//Caso não seja um vértice do grafo inicial
+                for(n = 1; n <= 9; n++){
+                    sudoku[x][y] = n; //Atualiza a matriz do jogo
+                    if(!possuiIgual(x,y)){
+                        break;
+                    }
+                }    getchar();  
+                    draw_board(x, y);
+                    refresh();
+
+            } 
+        }     
+        
+    }
+    //printf("Teste\n");
+    return;
 }
