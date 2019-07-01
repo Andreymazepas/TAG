@@ -1,8 +1,9 @@
 #include <curses.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
 
 int getposX(int X);
 int getposY(int Y);
@@ -41,6 +42,8 @@ int sudoku[9][9];
 
 int main(void)
 {
+    srand(time(NULL));
+
     int y, x; // variaveis de uso situacional para x e y, como cursor ou posicao de numero
     int ch;   // caractere lido
 
@@ -138,8 +141,11 @@ int main(void)
             break;
         case 'n':
         case 'N':
+            inicializaCampo();
             criaNovoJogo();
             inicializaCampo();
+            refresh();
+            break;
         }
 
         if ((ch > '0' && ch <= '9'))
@@ -212,6 +218,37 @@ void desenhaFundo()
 
 void criaNovoJogo()
 {
+    // zera a matriz fixa
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            sudokuInitial[i][j] = 0;
+        }
+    }
+
+    // gera novos numeros para a matriz fixa
+    // funciona com numeros aleatorios, checando se podem fazer parte de uma solucaos
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (rand() % 10 > 7)
+            {
+                int new = rand() % 10;
+                sudokuInitial[i][j] = new;
+                if (possuiIgual(i, j))
+                {
+                    new = rand() % 10;
+                    sudokuInitial[i][j] = new;
+                    if (possuiIgual(i, j))
+                        sudokuInitial[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    return;
 }
 
 void desenhaCampo(int x, int y)
@@ -314,7 +351,7 @@ void geraSolucao()
                 //getchar();
                 desenhaCampo(x, y);
                 refresh();
-                usleep(100000); 
+                usleep(100000);
             }
         }
     }
