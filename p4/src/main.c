@@ -17,7 +17,7 @@ int restamEspacos();             // retorna 1 se ainda ha espacos a serem preenc
 int colAtual = 0;                // variaveis de auxilio, apontam pra posicao atual do solver
 int linAtual = 0;
 
-int sudokuInitial[9][9] = {{1, 0, 0, 0, 0, 0, 0, 0, 0},
+/*int sudokuInitial[9][9] = {{1, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 2, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 3, 0, 0, 0, 0, 0, 0},
 
@@ -27,19 +27,19 @@ int sudokuInitial[9][9] = {{1, 0, 0, 0, 0, 0, 0, 0, 0},
 
                            {0, 0, 0, 0, 0, 0, 7, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 8, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 9}};
+                           {0, 0, 0, 0, 0, 0, 0, 0, 9}};*/
 
-/*int sudokuInitial[9][9] =  {{8, 0, 0,    1, 5, 0,   6, 0, 0},
-                            {0, 0, 0,    3, 0, 0,   0, 4, 1},
-                            {5, 0, 0,    0, 0, 0,   7, 0, 0},
+int sudokuInitial[9][9] =  {{8, 0, 5,    0, 0, 1,   0, 2, 0},
+                            {0, 0, 0,    0, 0, 4,   0, 9, 0},
+                            {0, 0, 0,    0, 0, 0,   8, 0, 5},
                             
-                            {0, 0, 0,    0, 0, 9,   0, 6, 2},
-                            {0, 0, 0,    0, 3, 0,   0, 0, 0},
-                            {1, 4, 0,    8, 0, 0,   0, 0, 0},
+                            {1, 3, 0,    0, 0, 8,   0, 0, 0},
+                            {5, 0, 0,    0, 3, 0,   0, 0, 9},
+                            {0, 0, 0,    9, 0, 0,   0, 1, 7},
                             
-                            {0, 0, 8,    0, 0, 0,   0, 0, 9},
-                            {2, 9, 0,    0, 0, 1,   0, 0, 0},
-                            {0, 0, 5,    0, 9, 7,   0, 0, 6}};*/
+                            {6, 0, 7,    0, 0, 0,   0, 0, 0},
+                            {0, 4, 0,    6, 0, 0,   0, 0, 0},
+                            {0, 1, 0,    2, 0, 0,   9, 0, 6}};
 
 int sudoku[9][9];
 
@@ -236,26 +236,28 @@ void criaNovoJogo()
     }
 
     // gera novos numeros para a matriz fixa
-    // funciona com numeros aleatorios, checando se podem fazer parte de uma solucaos
+    // funciona com numeros aleatorios, checando se podem fazer parte de uma solucao
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            if (rand() % 10 >= 9)
+            if (rand() % 10 >= 8)
             {
                 int new = rand() % 10;
                 sudokuInitial[i][j] = new;
+                sudoku[i][j] = new;
                 if (possuiIgual(i, j))
                 {
                     new = rand() % 10;
                     sudokuInitial[i][j] = new;
                     if (possuiIgual(i, j))
                         sudokuInitial[i][j] = 0;
+                        sudoku[i][j] = new;
                 }
             }
         }
     }
-
+    setbuf(stdin,NULL);
     return;
 }
 
@@ -355,7 +357,6 @@ int geraSolucao()
         sudoku[linAtual][colAtual] = numero;
         desenhaCampo(linAtual, colAtual);
         refresh();
-        //usleep(100000);
         if (!possuiIgual(linAtual, colAtual))
         {
             LinhaOG = linAtual;
@@ -369,10 +370,8 @@ int geraSolucao()
             sudoku[linAtual][colAtual] = '.' - 48; // reseta o valor
             desenhaCampo(linAtual, colAtual);
             refresh();
-        //usleep(100000);
         }
         
-
         sudoku[linAtual][colAtual] = backup;
     }
 
@@ -385,13 +384,11 @@ int restamEspacos() {
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
-        {
-            
+        {   
             if(sudoku[j][i] == '.' - 48){
                 linAtual = j;
                 colAtual = i;
                 return 1;
-
             }
         }
         
