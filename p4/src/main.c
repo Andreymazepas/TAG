@@ -11,8 +11,11 @@ void desenhaFundo();             // desenha o fundo e as intrucoes
 void inicializaCampo();          // inicializa a matriz do jogo com os valores da matriz fixa do jogo;
 void desenhaCampo(int x, int y); // desenha os numeros do jogo, selecionando onde esta o cursor
 int possuiIgual(int x, int y);   // checa se possui numero igual na col/linha/quadrado;
-void geraSolucao();              // Gera o passo-a-passo da solução do sudoku
+int geraSolucao();               // Gera o passo-a-passo da solução recursiva do sudoku
 void criaNovoJogo();             // Cria nova matriz fixa aleatoria
+int restamEspacos();             // retorna 1 se ainda ha espacos a serem preenchidos
+int colAtual = 0;                // variaveis de auxilio, apontam pra posicao atual do solver
+int linAtual = 0;
 
 int sudokuInitial[9][9] = {{1, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 2, 0, 0, 0, 0, 0, 0, 0},
@@ -137,7 +140,12 @@ int main(void)
             break;
         case 'c':
         case 'C':
-            geraSolucao();
+            linAtual =0;
+            colAtual = 0;
+            inicializaCampo();
+            if(!geraSolucao()){
+                printw("SEM SOLUCAO");
+            }
             break;
         case 'n':
         case 'N':
@@ -233,7 +241,7 @@ void criaNovoJogo()
     {
         for (int j = 0; j < 9; j++)
         {
-            if (rand() % 10 > 7)
+            if (rand() % 10 >= 9)
             {
                 int new = rand() % 10;
                 sudokuInitial[i][j] = new;
@@ -330,31 +338,63 @@ int possuiIgual(int x, int y)
     return 0;
 }
 
-void geraSolucao()
+int geraSolucao()
 {
-    int x, y, n;
 
-    for (x = 0; x < 9; x++)
+    int numero; // numero sendo testado
+    int LinhaOG, ColunaOG; // linha e coluna originais
+
+    // termino da funcao se nao ha mais o que resolver
+    if (!restamEspacos()){
+        return 1;
+    }
+
+    for (numero = 1; numero <= 9; numero++)
     {
-        for (y = 0; y < 9; y++)
-        { //Percorre o Grafo
-            if (!sudokuInitial[x][y])
-            { //Caso não seja um vértice do grafo inicial
-                for (n = 1; n <= 9; n++)
-                {
-                    sudoku[x][y] = n; //Atualiza a matriz do jogo
-                    if (!possuiIgual(x, y))
-                    {
-                        break;
-                    }
-                }
-                //getchar();
-                desenhaCampo(x, y);
-                refresh();
-                usleep(100000);
+        int backup = sudoku[linAtual][colAtual];
+        sudoku[linAtual][colAtual] = numero;
+        desenhaCampo(linAtual, colAtual);
+        refresh();
+        //usleep(100000);
+        if (!possuiIgual(linAtual, colAtual))
+        {
+            LinhaOG = linAtual;
+            ColunaOG = colAtual;
+            if (geraSolucao())
+                return 1;
+            // ao voltar o valor, atualizar valores anteriores de linha e coluna para backtraking       
+            linAtual = LinhaOG;
+            colAtual = ColunaOG;
+            
+            sudoku[linAtual][colAtual] = '.' - 48; // reseta o valor
+            desenhaCampo(linAtual, colAtual);
+            refresh();
+        //usleep(100000);
+        }
+        
+
+        sudoku[linAtual][colAtual] = backup;
+    }
+
+    return 0;
+}
+
+// retorna se ha espacos a serem resolvidos
+// uso exclusivo do solver, atualiza posicao das vars globais de coluna e linha
+int restamEspacos() {
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            
+            if(sudoku[j][i] == '.' - 48){
+                linAtual = j;
+                colAtual = i;
+                return 1;
+
             }
         }
+        
     }
-    //printf("Teste\n");
-    return;
+    return 0;
 }
